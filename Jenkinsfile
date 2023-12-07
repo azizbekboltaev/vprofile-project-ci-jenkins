@@ -22,6 +22,19 @@ pipeline {
             steps {
                 sh 'mvn -s settings.xml -DskipTests install'
             }
+
+            post {
+                success {
+                    echo "now archiving"
+                    archiveArtifacts artifacts: '**/*.war'
+                }
+            }
+        }
+
+        stage('Checkstyle Analysis'){
+            steps {
+                sh 'mvn-checkstyle:checkstyle'
+            }
         }
     }
 }
