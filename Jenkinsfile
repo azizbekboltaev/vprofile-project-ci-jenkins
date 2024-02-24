@@ -98,7 +98,7 @@ pipeline {
             echo 'slack notification'
             slackSend channel: '#cicd-project',
                 color: COLOR_MAP[currentBuild.currentResult],
-                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${BUILD_NUMBER} \n More info you can find at: ${env.BUILD_URL}"
+                message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info you can find at: ${env.BUILD_URL}"
         }
     }
 }
