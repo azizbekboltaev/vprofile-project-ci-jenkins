@@ -21,6 +21,7 @@ pipeline {
         NEXUS_LOGIN = 'nexuslogin'
         SONARSERVER = 'sonarserver'
         SONARSCANNER = 'sonarscanner'
+        NEXUSPASS = credentials('nexuspass')
     }
 
     stages {
@@ -92,6 +93,29 @@ pipeline {
                     )
             }
         }
+        stage('Ansible Deploy to staging'){
+            steps {
+                ansiblePlaybook([
+                inventory   : 'ansible/stage.inventory',
+                playbook    : 'ansible/site.yml',
+                installation: 'ansible',
+                colorized   : true,
+			    credentialsId: 'applogin',
+			    disableHostKeyChecking: true,
+                extraVars   : [
+                   	USER: "admin",
+                    PASS: "${NEXUSPASS}",
+			        nexusip: "172.31.58.112",
+			        reponame: "vprofile-release",
+			        groupid: "QA",
+			        time: "${env.BUILD_TIMESTAMP}",
+			        build: "${env.BUILD_ID}",
+                    artifactid: "vproapp",
+			        vprofile_version: "vproapp-${env.BUILD_ID}-${env.BUILD_TIMESTAMP}.war"
+                ]
+             ])
+            }
+        }
     }
     post {
         always {
@@ -101,4 +125,4 @@ pipeline {
                 message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} build ${env.BUILD_NUMBER} \n More info you can find at: ${env.BUILD_URL}"
         }
     }
-}
+}   
